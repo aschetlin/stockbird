@@ -15,19 +15,33 @@ api = tweepy.API(auth)
 
 
 def main():
-    operation = int(input("What would you like to do?\n(1) Update Status (2) DM a user \n"))
+    print("What would you like to do?\n(1) Update Status (2) DM a user\n")
+    operation = int(input("> "))
 
     if operation == 1:
-        api.update_status(input("What would you like to tweet? \n"))
-        return
+        print("What would you like to tweet? \n")
+        api.update_status(input("> "))
 
     elif operation == 2:
-        user_name = input("Who would you like to DM? \n")
+        print("Who would you like to DM? \n")
+        user_name = input("> ")
         user = api.get_user(user_name)
 
-        message = input("What message would you like to send? \n")
-        api.send_direct_message(user.id, message)
-        return
+        print("What message would you like the send? \n")
+        message = input("> ")
+        try:
+            api.send_direct_message(user.id, message)
+
+        except tweepy.TweepError.api_code as e:
+            if e.api_code == 349:
+                print(
+                    "You cannot message this user. "
+                    "They may be private, have messages disabled, "
+                    "or have your account blocked."
+                )
+
+            else:
+                raise e
 
     else:
         print("Invalid input.")
