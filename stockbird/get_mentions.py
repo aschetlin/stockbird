@@ -1,7 +1,7 @@
 import time
+from stockbird.config import logger
 
 from stockbird.read_write_id import read_id, write_id
-from stockbird.handle_tweets import handle_tweets
 
 
 # interates through mentions, adding those that fit the criteria to tweet_queue
@@ -11,30 +11,26 @@ def get_mentions_factory(api, tweet_queue):
         prev_id = read_id()
 
         while True:
-            print(tweet_queue.qsize())
-            try:
-                # adds mention to list if it hasn't been processed
-                mentions = (
-                    api.mentions_timeline()
-                    if prev_id == None
-                    else api.mentions_timeline(since_id=prev_id)
-                )
+            logger.debug(f"Tweet Queue: {tweet_queue.qsize()}")
 
-                if len(mentions) > 0:
-                    prev_id = mentions[0].id_str
+            # adds mention to list if it hasn't been processed
+            mentions = (
+                api.mentions_timeline()
+                if prev_id == None
+                else api.mentions_timeline(since_id=prev_id)
+            )
 
-                    for tweet in mentions:
-                        print(f"Mention from {tweet.author.name}")
+            if len(mentions) > 0:
+                prev_id = mentions[0].id_str
 
-                        if "fen:" in tweet.text:
-                            tweet_queue.put(tweet)
-                            print(tweet_queue.qsize())
+                for tweet in mentions:
+                    logger.info(f"Mention from {tweet.author.name}")
 
-                    write_id(prev_id)
-                    handle_tweets()
+                    if "fen:" in tweet.text:
+                        tweet_queue.put(tweet)
+                        logger.debug(f"Tweet Queue: {tweet_queue.qsize()}")
 
-            except Exception as e:
-                print(e)
+                write_id(prev_id)
 
             time.sleep(20)
 

@@ -1,6 +1,9 @@
 import time
 
+import chess
 from stockfish import Stockfish
+
+from stockbird.config import logger
 
 
 def handle_tweets_factory(api, tweet_queue):
@@ -9,10 +12,14 @@ def handle_tweets_factory(api, tweet_queue):
     def _():
 
         while True:
-            print(tweet_queue.qsize())
+            logger.debug(f"Tweet Queue: {tweet_queue.qsize()}")
 
             try:
                 tweet = tweet_queue.get()
+
+                if not tweet:
+                    break
+
                 index = tweet.text.index("fen:") + 4
                 substr = tweet.text[index:]
 
@@ -22,31 +29,27 @@ def handle_tweets_factory(api, tweet_queue):
                         in_reply_to_status_id=tweet.id,
                         auto_populate_reply_metadata=True,
                     )
-                    tweet_queue.task_done()
 
                 else:
-                    stockfish.set_fen_position(substr)
 
                     try:
-                        best_move = str(stockfish.get_best_move())
+                        board = chess.Board(fen=substr)
+                        best_move = str(board.fen())
                         api.update_status(
                             f"Best move is probably: {best_move}",
                             in_reply_to_status_id=tweet.id,
                             auto_populate_reply_metadata=True,
                         )
-                        tweet_queue.task_done()
 
-                    except BrokenPipeError:
+                    except ValueError:
                         api.update_status(
                             "Invalid FEN.",
                             in_reply_to_status_id=tweet.id,
                             auto_populate_reply_metadata=True,
                         )
-                        tweet_queue.task_done()
 
-            except Exception as e:
-                print(e)
-
-            time.sleep(5)
+            finally:
+                tweet_queue.task_done()
+                logger.debug(f"Tweet Queue: {tweet_queue.qsize()}")
 
     return _

@@ -1,4 +1,5 @@
 import tweepy
+import logging
 
 
 def cli_access(api):
@@ -14,7 +15,7 @@ def cli_access(api):
         user_name = input("> ")
         user = api.get_user(user_name)
 
-        print("What message would you like the send? \n")
+        print("What message would you like to send? \n")
         message = input("> ")
         try:
             api.send_direct_message(user.id, message)
@@ -31,5 +32,5 @@ def cli_access(api):
                 raise e
 
     else:
-        print("Invalid input.")
+        logging.error("Invalid input.")
         return

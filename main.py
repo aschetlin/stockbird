@@ -1,12 +1,14 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import sys
 import threading
 
 from persistqueue import Queue
 from stockfish import Stockfish
+
 from stockbird.api import TwitterAPI
 from stockbird.cli_access import cli_access
+from stockbird.config import logger
 from stockbird.get_mentions import get_mentions_factory
 from stockbird.handle_tweets import handle_tweets_factory
 
@@ -26,9 +28,8 @@ def __init__(api, tweet_queue, args: str = None):
 
 
 if __name__ == "__main__":
-    api = TwitterAPI()
-    stockfish = Stockfish()
-    tweet_queue = Queue("queue")
+    api = TwitterAPI().api
+    tweet_queue = Queue(".queues/queue")
 
     try:
 
@@ -36,13 +37,12 @@ if __name__ == "__main__":
             __init__(
                 api=api,
                 tweet_queue=tweet_queue,
-                stockfish=stockfish,
                 args=sys.argv[1],
             )
 
         else:
-            __init__(api=api, tweet_queue=tweet_queue, stockfish=stockfish)
+            __init__(api=api, tweet_queue=tweet_queue)
 
     except KeyboardInterrupt:
-        print("\nExiting.")
+        logger.warn("\nExiting.")
         sys.exit(0)

@@ -1,3 +1,6 @@
+__pycache__
 .python-version
+.queues
+.env
 id.txt
-queue
+
