@@ -1,3 +1,5 @@
 persistQueue
 PySocks
 tweepy
+stockfish
+chess
