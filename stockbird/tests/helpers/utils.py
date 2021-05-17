@@ -1,6 +1,6 @@
-import threading
+from stockfish import Stockfish
 
-from stockbird.handle_tweets import handle_tweets_factory
+from stockbird.handle_tweets import handle_tweets
 from stockbird.get_mentions import get_mentions
 from stockbird.mocks.api_mock import TwitterAPIMock
 from stockbird.mocks.tweet_mock import TweetMock
@@ -9,19 +9,12 @@ from stockbird.mocks.tweet_mock import TweetMock
 def handle_tweets_helper(string: str, input_queue, output_queue):
     api = TwitterAPIMock(queue=output_queue)
     tweet = TweetMock(string)
-
-    thread = threading.Thread(
-        target=handle_tweets_factory(api, input_queue)
-    )
-
-    thread.start()
+    stockfish = Stockfish()
 
     input_queue.put(tweet)
+    handle_tweets(api, input_queue, stockfish)
     output = output_queue.get()
     output_queue.task_done()
-    input_queue.put(None)
-
-    thread.join()
 
     return output
 
