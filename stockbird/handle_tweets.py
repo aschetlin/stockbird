@@ -1,5 +1,3 @@
-import time
-
 import chess
 from stockfish import Stockfish
 
@@ -34,7 +32,8 @@ def handle_tweets_factory(api, tweet_queue):
 
                     try:
                         board = chess.Board(fen=substr)
-                        best_move = str(board.fen())
+                        stockfish.set_fen_position(board.fen())
+                        best_move = stockfish.get_best_move()
                         api.update_status(
                             f"Best move is probably: {best_move}",
                             in_reply_to_status_id=tweet.id,

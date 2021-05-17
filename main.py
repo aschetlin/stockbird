@@ -4,7 +4,6 @@ import sys
 import threading
 
 from persistqueue import Queue
-from stockfish import Stockfish
 
 from stockbird.api import TwitterAPI
 from stockbird.cli_access import cli_access
