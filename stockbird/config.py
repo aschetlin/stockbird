@@ -21,12 +21,13 @@ def fetch_config(envvar: str, default=None) -> str:
     return var
 
 
-consumer_key = fetch_config("TWT_API_KEY")
-consumer_secret = fetch_config("TWT_API_SECRET")
-access_token = fetch_config("TWT_ACCESS_TOKEN")
-access_secret = fetch_config("TWT_ACCESS_SECRET")
-gist_url = fetch_config("TWT_GIST_URL")
-gist_secret = fetch_config("TWT_GIST_SECRET")
+consumer_key = fetch_config("API_KEY")
+consumer_secret = fetch_config("API_SECRET")
+access_token = fetch_config("ACCESS_TOKEN")
+access_secret = fetch_config("ACCESS_SECRET")
+gist_url = fetch_config("GIST_URL")
+test_gist_url = fetch_config("TEST_GIST_URL")
+gist_secret = fetch_config("GIST_SECRET")
 log_level = fetch_config("STOCKBIRD_LOGLEVEL", default="INFO")
 
 logger.setLevel(log_level)

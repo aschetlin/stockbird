@@ -3,9 +3,10 @@ import requests
 from stockbird.config import gist_secret, gist_url
 
 
-def read_id():
+def read_id(url=gist_url):
+
     with requests.get(
-        f"https://api.github.com/gists/{gist_url}",
+        f"https://api.github.com/gists/{url}",
         headers={"Accept": "application/vnd.github.v3+json"},
     ) as r:
 
@@ -17,9 +18,9 @@ def read_id():
         )
 
 
-def write_id(id):
+def write_id(id, url=gist_url):
     requests.patch(
-        f"https://api.github.com/gists/{gist_url}",
+        f"https://api.github.com/gists/{url}",
         headers={
             "Accept": "application/vnd.github.v3+json",
             "Authorization": f"token {gist_secret}",

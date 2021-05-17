@@ -1,11 +1,11 @@
 import time
 
-from stockbird.config import logger
+from stockbird.config import logger, gist_url
 from stockbird.read_write_id import read_id, write_id
 
 
-def get_mentions(api, tweet_queue):
-    prev_id = read_id()
+def get_mentions(api, tweet_queue, gist_url=gist_url):
+    prev_id = read_id(url=gist_url)
 
     logger.debug(f"Tweet Queue: {tweet_queue.qsize()}")
 
@@ -26,7 +26,7 @@ def get_mentions(api, tweet_queue):
                 tweet_queue.put(tweet)
                 logger.debug(f"Tweet Queue: {tweet_queue.qsize()}")
 
-        write_id(prev_id)
+        write_id(prev_id, url=gist_url)
 
 
 def get_mentions_factory(api, tweet_queue):
