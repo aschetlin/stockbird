@@ -1,5 +1,4 @@
-import pytest
-from utils import handle_tweets_helper
+from stockbird.tests.helpers.utils import handle_tweets_helper
 
 
 def test_handle_tweets_valid(input_queue, output_queue):
