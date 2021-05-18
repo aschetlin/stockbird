@@ -1,6 +1,6 @@
+import logging
 import os
 import sys
-import logging
 
 logging.basicConfig()
 logger = logging.getLogger("stockbird_logger")

@@ -1,6 +1,6 @@
 import time
 
-from stockbird.config import logger, gist_url
+from stockbird.config import gist_url, logger
 from stockbird.read_write_id import read_id, write_id
 
 

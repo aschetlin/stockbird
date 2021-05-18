@@ -1,5 +1,6 @@
-import tweepy
 import logging
+
+import tweepy
 
 
 def cli_access(api):

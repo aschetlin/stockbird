@@ -1,10 +1,10 @@
 from stockfish import Stockfish
 
-from stockbird.handle_tweets import handle_tweets
+from stockbird.config import test_gist_url
 from stockbird.get_mentions import get_mentions
+from stockbird.handle_tweets import handle_tweets
 from stockbird.mocks.api_mock import TwitterAPIMock
 from stockbird.mocks.tweet_mock import TweetMock
-from stockbird.config import test_gist_url
 
 
 def handle_tweets_helper(string: str, input_queue, output_queue):
