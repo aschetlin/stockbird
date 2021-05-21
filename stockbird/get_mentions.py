@@ -27,7 +27,7 @@ def get_mentions(api, tweet_queue, gist_url=gist_url):
                 message_object = Mention(
                     author=tweet.author.name,
                     text=tweet.text,
-                    id=tweet.id,
+                    id=str(tweet.id),
                     command=CommandType.BEST_MOVE,
                 )
 

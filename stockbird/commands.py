@@ -1,7 +1,6 @@
 import random
 
 import chess
-import redis
 
 from stockbird.command_resources import CommandResources
 from stockbird.protos.mentions_pb2 import CommandType
