@@ -5,14 +5,24 @@ from stockbird.get_mentions import get_mentions
 from stockbird.handle_tweets import handle_tweets
 from stockbird.mocks.api_mock import TwitterAPIMock
 from stockbird.mocks.tweet_mock import TweetMock
+from stockbird.protos.mentions_pb2 import Mention, CommandType
 
 
-def handle_tweets_helper(string: str, input_queue, output_queue):
+def handle_tweets_helper(
+    string: str, input_queue, output_queue, command=CommandType.BEST_MOVE
+):
     api = TwitterAPIMock(queue=output_queue)
     tweet = TweetMock(string)
     stockfish = Stockfish()
 
-    input_queue.put(tweet)
+    mention_object = Mention(
+        author=tweet.author.name,
+        text=tweet.text,
+        id=tweet.id,
+        command=command,
+    )
+
+    input_queue.put(mention_object)
     handle_tweets(api, input_queue, stockfish)
     output = output_queue.get()
     output_queue.task_done()

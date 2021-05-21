@@ -1,6 +1,8 @@
+from stockbird.protos.mentions_pb2 import CommandType
 import chess
 
 from stockbird.config import logger
+from stockbird.commands import commands
 
 
 def handle_tweets(api, tweet_queue, stockfish):
@@ -8,35 +10,8 @@ def handle_tweets(api, tweet_queue, stockfish):
 
     try:
         tweet = tweet_queue.get()
-
-        index = tweet.text.index("fen:") + 4
-        substr = tweet.text[index:]
-
-        if "fen:" in substr:
-            api.update_status(
-                "Your tweet contained multiple FEN keywords.",
-                in_reply_to_status_id=tweet.id,
-                auto_populate_reply_metadata=True,
-            )
-
-        else:
-
-            try:
-                board = chess.Board(fen=substr)
-                stockfish.set_fen_position(board.fen())
-                best_move = stockfish.get_best_move()
-                api.update_status(
-                    f"Best move is probably: {best_move}",
-                    in_reply_to_status_id=tweet.id,
-                    auto_populate_reply_metadata=True,
-                )
-
-            except ValueError:
-                api.update_status(
-                    "Invalid FEN.",
-                    in_reply_to_status_id=tweet.id,
-                    auto_populate_reply_metadata=True,
-                )
+        command = commands[CommandType.Name(tweet.command)]
+        command(api, tweet, stockfish)
 
     finally:
         tweet_queue.task_done()

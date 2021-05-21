@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+message Mention {
+  string author = 1;
+  string text = 2;
+  string id = 3;
+  CommandType command = 4;
+}
+
+enum CommandType {
+  BEST_MOVE = 0;
+  START_GAME = 1;
+}
+
+message BestMove {
+  string fen = 1;
+  optional int32 depth = 2;
+}
+
+message StartGame {
+  optional int32 depth = 1;
+}

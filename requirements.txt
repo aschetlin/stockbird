@@ -1,5 +1,6 @@
-persistQueue
-PySocks
-tweepy
-stockfish
 chess
+persistqueue
+protobuf
+pysocks
+stockfish
+tweepy
