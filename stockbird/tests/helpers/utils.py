@@ -1,18 +1,30 @@
-from stockfish import Stockfish
-
+import fakeredis
 from stockbird.config import test_gist_url
 from stockbird.get_mentions import get_mentions
 from stockbird.handle_tweets import handle_tweets
 from stockbird.mocks.api_mock import TwitterAPIMock
 from stockbird.mocks.tweet_mock import TweetMock
-from stockbird.protos.mentions_pb2 import Mention, CommandType
+from stockbird.protos.mentions_pb2 import CommandType, Mention
+from stockfish import Stockfish
 
 
 def handle_tweets_helper(
-    string: str, input_queue, output_queue, command=CommandType.BEST_MOVE
+    string: str,
+    input_queue,
+    output_queue,
+    command=CommandType.BEST_MOVE,
+    author=None,
 ):
+    r = fakeredis.FakeStrictRedis()
     api = TwitterAPIMock(queue=output_queue)
-    tweet = TweetMock(string)
+
+    r.set("duplicate_guy", "foo")
+
+    if author:
+        tweet = TweetMock(string, author)
+    else:
+        tweet = TweetMock(string)
+
     stockfish = Stockfish()
 
     mention_object = Mention(
@@ -23,7 +35,7 @@ def handle_tweets_helper(
     )
 
     input_queue.put(mention_object)
-    handle_tweets(api, input_queue, stockfish)
+    handle_tweets(api, input_queue, stockfish, r=r)
     output = output_queue.get()
     output_queue.task_done()
 

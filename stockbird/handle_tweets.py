@@ -1,17 +1,24 @@
-from stockbird.protos.mentions_pb2 import CommandType
-import chess
+import redis
 
-from stockbird.config import logger
+from stockbird.command_resources import CommandResources
 from stockbird.commands import commands
+from stockbird.config import logger
+from stockbird.protos.mentions_pb2 import CommandType
 
 
-def handle_tweets(api, tweet_queue, stockfish):
+def handle_tweets(
+    api,
+    tweet_queue,
+    stockfish,
+    r=redis.Redis(host="localhost", port=6379, db=0),
+):
+
     logger.debug(f"Tweet Queue: {tweet_queue.qsize()}")
 
     try:
         tweet = tweet_queue.get()
         command = commands[CommandType.Name(tweet.command)]
-        command(api, tweet, stockfish)
+        command(CommandResources(api, tweet, stockfish, r))
 
     finally:
         tweet_queue.task_done()

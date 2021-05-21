@@ -2,7 +2,7 @@ from stockbird.protos.mentions_pb2 import CommandType
 from stockbird.tests.helpers.utils import handle_tweets_helper
 
 
-def test_handle_tweets_valid_best_move(input_queue, output_queue):
+def test_valid_best_move(input_queue, output_queue):
     output = handle_tweets_helper(
         """
         @stockbirdchess
@@ -14,7 +14,7 @@ def test_handle_tweets_valid_best_move(input_queue, output_queue):
     assert "Best move is probably: " in output
 
 
-def test_handle_tweets_valid_start_game(input_queue, output_queue):
+def test_valid_start_game(input_queue, output_queue):
     output = handle_tweets_helper(
         "@playchess_bot start game",
         input_queue,
@@ -25,7 +25,19 @@ def test_handle_tweets_valid_start_game(input_queue, output_queue):
     assert "New game started." in output
 
 
-def test_handle_tweets_invalid_fen(input_queue, output_queue):
+def test_duplicate_game(input_queue, output_queue):
+    output = handle_tweets_helper(
+        "playchess_bot start game",
+        input_queue,
+        output_queue,
+        author="duplicate_guy",
+        command=CommandType.START_GAME,
+    )
+
+    assert "You already have an in-progress game." in output
+
+
+def test_invalid_fen(input_queue, output_queue):
     output = handle_tweets_helper(
         """
         @stockbirdchess
@@ -37,7 +49,7 @@ def test_handle_tweets_invalid_fen(input_queue, output_queue):
     assert output == "Invalid FEN."
 
 
-def test_handle_tweets_multiple_fen(input_queue, output_queue):
+def test_multiple_fen(input_queue, output_queue):
     output = handle_tweets_helper(
         """
         @stockbirdchess fen:537453480 fen:584035894

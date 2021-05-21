@@ -1,12 +1,17 @@
 import random
 
 import chess
-from stockfish.models import Stockfish
+import redis
 
+from stockbird.command_resources import CommandResources
 from stockbird.protos.mentions_pb2 import CommandType
 
 
-def best_move(api, tweet, stockfish):
+def best_move(resources: CommandResources):
+    api = resources.api
+    stockfish = resources.stockfish
+    tweet = resources.tweet
+
     index = tweet.text.index("fen:") + 4
     substr = tweet.text[index:]
 
@@ -40,7 +45,21 @@ def best_move(api, tweet, stockfish):
             )
 
 
-def start_game(api, tweet, stockfish: Stockfish):
+def start_game(resources: CommandResources):
+    api = resources.api
+    r = resources.redis
+    stockfish = resources.stockfish
+    tweet = resources.tweet
+
+    current_fen = r.get(tweet.author)
+    if current_fen:
+        api.update_status(
+            f"You already have an in-progress game.",
+            in_reply_to_status_id=tweet.id,
+            auto_populate_reply_metadata=True,
+        )
+        return
+
     color = random.choice(("black", "white"))
 
     if color == "black":
@@ -50,6 +69,7 @@ def start_game(api, tweet, stockfish: Stockfish):
 
         if move:
             board.push_san(move)
+            r.set(tweet.author, board.fen())
 
         else:
             raise Exception("Stockfish did not return a move.")
@@ -62,6 +82,9 @@ def start_game(api, tweet, stockfish: Stockfish):
         )
 
     else:
+        board = chess.Board()
+        r.set(tweet.author, board.fen())
+
         api.update_status(
             f"New game started. You will play white.",
             in_reply_to_status_id=tweet.id,
