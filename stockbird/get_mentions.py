@@ -1,8 +1,15 @@
+import re
 import time
 
-from stockbird.config import gist_url, logger
+from stockbird.config import gist_url, handle, logger
+from stockbird.exceptions import InvalidCommandException
+from stockbird.protos.mentions_pb2 import CommandType, Mention
 from stockbird.read_write_id import read_id, write_id
-from stockbird.protos.mentions_pb2 import Mention, CommandType
+
+commands = {
+    "fen": CommandType.BEST_MOVE,
+    "start": CommandType.START_GAME,
+}
 
 
 def get_mentions(api, tweet_queue, gist_url=gist_url):
@@ -23,16 +30,30 @@ def get_mentions(api, tweet_queue, gist_url=gist_url):
 
             logger.info(f"Mention from {tweet.author.name}")
 
-            if "fen:" in tweet.text:
-                message_object = Mention(
-                    author=tweet.author.name,
-                    text=tweet.text,
-                    id=str(tweet.id),
-                    command=CommandType.BEST_MOVE,
-                )
+            regex = r"\b([\w_]+): ?(.*)"
+            match_data = re.search(regex, tweet.text)
 
-                tweet_queue.put(message_object)
-                logger.debug(f"Tweet Queue: {tweet_queue.qsize()}")
+            if not match_data:
+                logger.warning(f"Invalid command attempted: {tweet.text}")
+                continue
+
+            command_str = match_data.group(1)
+
+            if command_str not in commands:
+                logger.warning(f"Invalid command attempted: {tweet.text}")
+                continue
+
+            command = commands[command_str]
+
+            message_object = Mention(
+                author=tweet.author.name,
+                text=tweet.text,
+                id=str(tweet.id),
+                command=command,
+            )
+
+            tweet_queue.put(message_object)
+            logger.debug(f"Tweet Queue: {tweet_queue.qsize()}")
 
         write_id(prev_id, url=gist_url)
 

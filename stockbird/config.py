@@ -30,6 +30,7 @@ gist_url = fetch_config("GIST_URL")
 test_gist_url = fetch_config("TEST_GIST_URL")
 gist_secret = fetch_config("GIST_SECRET")
 log_level = fetch_config("STOCKBIRD_LOGLEVEL", default="INFO")
+handle = fetch_config("STOCKBIRD_HANDLE", default="@playchess_bot")
 
 logger.setLevel(log_level)
 print(logger.level)

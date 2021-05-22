@@ -1,12 +1,20 @@
+import pytest
+from stockbird.exceptions import InvalidCommandException
 from stockbird.protos.mentions_pb2 import CommandType
 from stockbird.tests.helpers.utils import get_mentions_helper
 
 
-def test_invalid(output_queue):
+def test_no_command(output_queue):
     output = get_mentions_helper(
         text="foobar",
         output_queue=output_queue,
     )
+
+    assert not output
+
+
+def test_invalid_command(output_queue):
+    output = get_mentions_helper(text="foobar:", output_queue=output_queue)
 
     assert not output
 
@@ -23,8 +31,6 @@ def test_best_move_valid(output_queue):
 
 
 def test_start_game_valid(output_queue):
-    output = get_mentions_helper(
-        text="start game", output_queue=output_queue
-    )
+    output = get_mentions_helper(text="start:", output_queue=output_queue)
 
     assert output.command == CommandType.START_GAME
